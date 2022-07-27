@@ -2,52 +2,52 @@
 
 set -uo pipefail;
 
-if [ -z "${TFENV_ROOT:-""}" ]; then
+if [ -z "${TGENV_ROOT:-""}" ]; then
   # http://stackoverflow.com/questions/1055671/how-can-i-get-the-behavior-of-gnus-readlink-f-on-a-mac
   readlink_f() {
     local target_file="${1}";
     local file_name;
 
     while [ "${target_file}" != "" ]; do
-      cd "${target_file%/*}" || early_death "Failed to 'cd \$(${target_file%/*})' while trying to determine TFENV_ROOT";
-      file_name="${target_file##*/}" || early_death "Failed to '\"${target_file##*/}\"' while trying to determine TFENV_ROOT";
+      cd "${target_file%/*}" || early_death "Failed to 'cd \$(${target_file%/*})' while trying to determine TGENV_ROOT";
+      file_name="${target_file##*/}" || early_death "Failed to '\"${target_file##*/}\"' while trying to determine TGENV_ROOT";
       target_file="$(readlink "${file_name}")";
     done;
 
     echo "$(pwd -P)/${file_name}";
   };
-  TFENV_SHIM=$(readlink_f "${0}")
-  TFENV_ROOT="${TFENV_SHIM%/*/*}";
-  [ -n "${TFENV_ROOT}" ] || early_death "Failed to determine TFENV_ROOT";
+  TGENV_SHIM=$(readlink_f "${0}")
+  TGENV_ROOT="${TGENV_SHIM%/*/*}";
+  [ -n "${TGENV_ROOT}" ] || early_death "Failed to determine TGENV_ROOT";
 else
-  TFENV_ROOT="${TFENV_ROOT%/}";
+  TGENV_ROOT="${TGENV_ROOT%/}";
 fi;
-export TFENV_ROOT;
+export TGENV_ROOT;
 
-if [ -z "${TFENV_CONFIG_DIR:-""}" ]; then
-  TFENV_CONFIG_DIR="$TFENV_ROOT";
+if [ -z "${TGENV_CONFIG_DIR:-""}" ]; then
+  TGENV_CONFIG_DIR="$TGENV_ROOT";
 else
-  TFENV_CONFIG_DIR="${TFENV_CONFIG_DIR%/}";
+  TGENV_CONFIG_DIR="${TGENV_CONFIG_DIR%/}";
 fi
-export TFENV_CONFIG_DIR;
+export TGENV_CONFIG_DIR;
 
-if [ "${TFENV_DEBUG:-0}" -gt 0 ]; then
-  # Only reset DEBUG if TFENV_DEBUG is set, and DEBUG is unset or already a number
-  if [[ "${DEBUG:-0}" =~ ^[0-9]+$ ]] && [ "${DEBUG:-0}" -gt "${TFENV_DEBUG:-0}" ]; then
-    export DEBUG="${TFENV_DEBUG:-0}";
+if [ "${TGENV_DEBUG:-0}" -gt 0 ]; then
+  # Only reset DEBUG if TGENV_DEBUG is set, and DEBUG is unset or already a number
+  if [[ "${DEBUG:-0}" =~ ^[0-9]+$ ]] && [ "${DEBUG:-0}" -gt "${TGENV_DEBUG:-0}" ]; then
+    export DEBUG="${TGENV_DEBUG:-0}";
   fi;
-  if [[ "${TFENV_DEBUG}" -gt 2 ]]; then
+  if [[ "${TGENV_DEBUG}" -gt 2 ]]; then
     export PS4='+ [${BASH_SOURCE##*/}:${LINENO}] ';
     set -x;
   fi;
 fi;
 
 function load_bashlog () {
-  source "${TFENV_ROOT}/lib/bashlog.sh";
+  source "${TGENV_ROOT}/lib/bashlog.sh";
 };
 export -f load_bashlog;
 
-if [ "${TFENV_DEBUG:-0}" -gt 0 ] ; then
+if [ "${TGENV_DEBUG:-0}" -gt 0 ] ; then
   # our shim below cannot be used when debugging is enabled
   load_bashlog;
 else
@@ -72,8 +72,8 @@ function curlw () {
     TLS_OPT="";
   fi;
 
-  if [[ ! -z "${TFENV_NETRC_PATH:-""}" ]]; then
-    NETRC_OPT="--netrc-file ${TFENV_NETRC_PATH}";
+  if [[ ! -z "${TGENV_NETRC_PATH:-""}" ]]; then
+    NETRC_OPT="--netrc-file ${TGENV_NETRC_PATH}";
   else
     NETRC_OPT="";
   fi;
@@ -89,7 +89,7 @@ function check_active_version() {
       maybe_chdir="-chdir=${2}";
   fi;
 
-  local active_version="$(${TFENV_ROOT}/bin/terragrunt ${maybe_chdir} version | grep '^Terragrunt')";
+  local active_version="$(${TGENV_ROOT}/bin/terragrunt ${maybe_chdir} version | grep '^Terragrunt')";
 
   if ! grep -E "^Terragrunt v${v}((-dev)|( \([a-f0-9]+\)))?\$" <(echo "${active_version}"); then
     log 'debug' "Expected version ${v} but found ${active_version}";
@@ -103,14 +103,14 @@ export -f check_active_version;
 
 function check_installed_version() {
   local v="${1}";
-  local bin="${TFENV_CONFIG_DIR}/versions/${v}/terragrunt";
+  local bin="${TGENV_CONFIG_DIR}/versions/${v}/terragrunt";
   [ -n "$(${bin} version | grep -E "^Terragrunt v${v}((-dev)|( \([a-f0-9]+\)))?$")" ];
 };
 export -f check_installed_version;
 
 function check_default_version() {
   local v="${1}";
-  local def="$(cat "${TFENV_CONFIG_DIR}/version")";
+  local def="$(cat "${TGENV_CONFIG_DIR}/version")";
   [ "${def}" == "${v}" ];
 };
 export -f check_default_version;
@@ -149,9 +149,9 @@ function check_dependencies() {
 };
 export -f check_dependencies;
 
-source "$TFENV_ROOT/lib/tgenv-exec.sh";
-source "$TFENV_ROOT/lib/tgenv-min-required.sh";
-source "$TFENV_ROOT/lib/tgenv-version-file.sh";
-source "$TFENV_ROOT/lib/tgenv-version-name.sh";
+source "$TGENV_ROOT/lib/tgenv-exec.sh";
+source "$TGENV_ROOT/lib/tgenv-min-required.sh";
+source "$TGENV_ROOT/lib/tgenv-version-file.sh";
+source "$TGENV_ROOT/lib/tgenv-version-name.sh";
 
-export TFENV_HELPERS=1;
+export TGENV_HELPERS=1;

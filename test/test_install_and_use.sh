@@ -10,36 +10,36 @@ function early_death() {
   exit 1;
 };
 
-if [ -z "${TFENV_ROOT:-""}" ]; then
+if [ -z "${TGENV_ROOT:-""}" ]; then
   # http://stackoverflow.com/questions/1055671/how-can-i-get-the-behavior-of-gnus-readlink-f-on-a-mac
   readlink_f() {
     local target_file="${1}";
     local file_name;
 
     while [ "${target_file}" != "" ]; do
-      cd "$(dirname ${target_file})" || early_death "Failed to 'cd \$(dirname ${target_file})' while trying to determine TFENV_ROOT";
-      file_name="$(basename "${target_file}")" || early_death "Failed to 'basename \"${target_file}\"' while trying to determine TFENV_ROOT";
+      cd "$(dirname ${target_file})" || early_death "Failed to 'cd \$(dirname ${target_file})' while trying to determine TGENV_ROOT";
+      file_name="$(basename "${target_file}")" || early_death "Failed to 'basename \"${target_file}\"' while trying to determine TGENV_ROOT";
       target_file="$(readlink "${file_name}")";
     done;
 
     echo "$(pwd -P)/${file_name}";
   };
 
-  TFENV_ROOT="$(cd "$(dirname "$(readlink_f "${0}")")/.." && pwd)";
-  [ -n ${TFENV_ROOT} ] || early_death "Failed to 'cd \"\$(dirname \"\$(readlink_f \"${0}\")\")/..\" && pwd' while trying to determine TFENV_ROOT";
+  TGENV_ROOT="$(cd "$(dirname "$(readlink_f "${0}")")/.." && pwd)";
+  [ -n ${TGENV_ROOT} ] || early_death "Failed to 'cd \"\$(dirname \"\$(readlink_f \"${0}\")\")/..\" && pwd' while trying to determine TGENV_ROOT";
 else
-  TFENV_ROOT="${TFENV_ROOT%/}";
+  TGENV_ROOT="${TGENV_ROOT%/}";
 fi;
-export TFENV_ROOT;
+export TGENV_ROOT;
 
-if [ -n "${TFENV_HELPERS:-""}" ]; then
-  log 'debug' 'TFENV_HELPERS is set, not sourcing helpers again';
+if [ -n "${TGENV_HELPERS:-""}" ]; then
+  log 'debug' 'TGENV_HELPERS is set, not sourcing helpers again';
 else
-  [ "${TFENV_DEBUG:-0}" -gt 0 ] && echo "[DEBUG] Sourcing helpers from ${TFENV_ROOT}/lib/helpers.sh";
-  if source "${TFENV_ROOT}/lib/helpers.sh"; then
+  [ "${TGENV_DEBUG:-0}" -gt 0 ] && echo "[DEBUG] Sourcing helpers from ${TGENV_ROOT}/lib/helpers.sh";
+  if source "${TGENV_ROOT}/lib/helpers.sh"; then
     log 'debug' 'Helpers sourced successfully';
   else
-    early_death "Failed to source helpers from ${TFENV_ROOT}/lib/helpers.sh";
+    early_death "Failed to source helpers from ${TGENV_ROOT}/lib/helpers.sh";
   fi;
 fi;
 
@@ -62,10 +62,10 @@ test_install_and_use_with_env() {
   # Takes a static version and the optional keyword to install it with
   local k="${2-""}";
   local v="${1}";
-  TFENV_Terragrunt_VERSION="${k}" tgenv install || return 1;
+  TGENV_Terragrunt_VERSION="${k}" tgenv install || return 1;
   check_installed_version "${v}" || return 1;
-  TFENV_Terragrunt_VERSION="${k}" tgenv use || return 1;
-  TFENV_Terragrunt_VERSION="${k}" check_active_version "${v}" || return 1;
+  TGENV_Terragrunt_VERSION="${k}" tgenv use || return 1;
+  TGENV_Terragrunt_VERSION="${k}" check_active_version "${v}" || return 1;
   return 0;
 };
 
@@ -149,12 +149,12 @@ for ((test_iter=0; test_iter<${tests_count}; ++test_iter )) ; do
   kv="${tests__kv[${test_iter}]}";
   v="${kv%,*}";
   k="${kv##*,}";
-  log 'info' "## TFENV_Terragrunt_VERSION Test ${test_num}/${tests_count}: ${desc} ( ${k} / ${v} )";
+  log 'info' "## TGENV_Terragrunt_VERSION Test ${test_num}/${tests_count}: ${desc} ( ${k} / ${v} )";
   log 'info' "Writing 0.0.0 to ./.terragrunt-version";
   echo "0.0.0" > ./.terragrunt-version;
   test_install_and_use_with_env "${v}" "${k}" \
-    && log info "## TFENV_Terragrunt_VERSION Test ${test_num}/${tests_count}: ${desc} ( ${k} / ${v} ) succeeded" \
-    || error_and_proceed "## TFENV_Terragrunt_VERSION Test ${test_num}/${tests_count}: ${desc} ( ${k} / ${v} ) failed";
+    && log info "## TGENV_Terragrunt_VERSION Test ${test_num}/${tests_count}: ${desc} ( ${k} / ${v} ) succeeded" \
+    || error_and_proceed "## TGENV_Terragrunt_VERSION Test ${test_num}/${tests_count}: ${desc} ( ${k} / ${v} ) failed";
 done;
 
 cleanup || log 'error' 'Cleanup failed?!';

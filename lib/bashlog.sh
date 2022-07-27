@@ -33,7 +33,7 @@ function log() {
 
   local level="${1}";
   local upper="$(echo "${level}" | awk '{print toupper($0)}')";
-  local debug_level="${TFENV_DEBUG:-0}";
+  local debug_level="${TGENV_DEBUG:-0}";
   local stdout_colours="${BASHLOG_COLOURS:-1}";
 
   local custom_eval_prefix="${BASHLOG_I_PROMISE_TO_BE_CAREFUL_CUSTOM_EVAL_PREFIX:-""}";
