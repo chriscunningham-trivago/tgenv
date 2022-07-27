@@ -70,38 +70,38 @@ abort() {
     if [ "${#}" -eq 0 ]; then
       cat -;
     else
-      echo "tfenv: ${*}";
+      echo "tgenv: ${*}";
     fi;
   } >&2;
 };
 
-log 'debug' "tfenv argument is: ${arg}";
+log 'debug' "tgenv argument is: ${arg}";
 
 case "${arg}" in
   "")
     log 'debug' 'No argument provided, dumping version and help and aborting';
     {
-      tfenv---version;
-      tfenv-help;
+      tgenv---version;
+      tgenv-help;
     } | abort && exit 1;
 exit 1;
     ;;
   -v | --version )
-    log 'debug' 'tfenv version requested...';
-    exec tfenv---version;
+    log 'debug' 'tgenv version requested...';
+    exec tgenv---version;
     ;;
   -h | --help )
-    log 'debug' 'tfenv help requested...';
-    exec tfenv-help;
+    log 'debug' 'tgenv help requested...';
+    exec tgenv-help;
     ;;
   *)
     log 'debug' "Long argument provided: ${arg}";
-    command_path="$(command -v "tfenv-${arg}" || true)";
+    command_path="$(command -v "tgenv-${arg}" || true)";
     log 'debug' "Resulting command-path: ${command_path}";
     if [ -z "${command_path}" ]; then
       {
         echo "No such command '${arg}'";
-        tfenv-help;
+        tgenv-help;
       } | abort && exit 1;
     fi;
     shift 1;

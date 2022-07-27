@@ -60,6 +60,6 @@ done;
 
 log 'debug' "program=\"${0##*/}\"";
 
-declare tfenv_path="${TFENV_ROOT}/bin/tfenv";
+declare tfenv_path="${TFENV_ROOT}/bin/tgenv";
 
-tfenv-exec "$@";
+tgenv-exec "$@";
