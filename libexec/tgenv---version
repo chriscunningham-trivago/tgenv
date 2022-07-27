@@ -1,17 +1,13 @@
 #!/usr/bin/env bash
+# Summary: Display the version of tgenv
 #
-# Summary: Run an executable with the selected Terraform version
+# Displays the version number of this tgenv release, including the
+# current revision from git, if available.
 #
-# Usage: tfenv exec <command> [arg1 arg2...]
-#
-# Runs an executable by first preparing PATH so that the selected Terraform
-# version's `bin' directory is at the front.
-#
-# For example, if the currently selected Terraform version is 0.7.0:
-#   tfenv exec plan
-#
-# is equivalent to:
-#   PATH="$TFENV_ROOT/versions/0.7.0/bin:$PATH" terraform plan
+# The format of the git revision is:
+#   <version>-<num_commits>-<git_sha>
+# where `num_commits` is the number of commits since `version` was
+# tagged.
 
 set -uo pipefail;
 
@@ -72,4 +68,19 @@ done;
 # Begin Script Body #
 #####################
 
-tfenv-exec "$@";
+log 'debug' 'Scraping tgenv version from CHANGELOG.md';
+version="$(awk '/^##/{ print $2; exit}' "${TFENV_ROOT}/CHANGELOG.md")" \
+  && log 'debug' "Found version '${version}' in CHANGELOG.md" \
+  || log 'error' 'Failed to scrape version from CHANGELOG.md';
+
+git_revision="";
+if cd "$(dirname ${0})" 2>/dev/null && git remote -v 2>/dev/null | grep -q tgenv; then
+  log 'debug' 'Git configuration found. Overriding CHANGELOG version from git revision...';
+  git_revision="$(git describe --tags HEAD 2>/dev/null || true)";
+  log 'debug' "Stripping git revision string from ${git_revision}";
+  git_revision="${git_revision#v}";
+fi;
+
+echo "tgenv ${git_revision:-$version}";
+
+exit 0;

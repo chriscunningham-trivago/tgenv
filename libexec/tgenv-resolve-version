@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Usage: tfenv resolve-version [<version>]
+# Usage: tgenv resolve-version [<version>]
 # Summary: Resolve the version to action based on the environment and optional input token
 
 set -uo pipefail;
@@ -59,7 +59,7 @@ done;
 
 # If on MacOS with Homebrew, use GNU grep
 # This allows keybase login detection to work on Mac,
-# and is required to be able to detect terraform version
+# and is required to be able to detect terragrunt version
 # from "required_version" setting in "*.tf" files
 check_dependencies;
 
@@ -71,8 +71,8 @@ declare version_requested version regex min_required version_file;
 
 declare arg="${1:-""}";
 
-if [ -z "${arg}" -a -z "${TFENV_TERRAFORM_VERSION:-""}" ]; then
-  version_file="$(tfenv-version-file)";
+if [ -z "${arg}" -a -z "${TFENV_Terragrunt_VERSION:-""}" ]; then
+  version_file="$(tgenv-version-file)";
   log 'debug' "Version File: ${version_file}";
 
   if [ "${version_file}" != "${TFENV_CONFIG_DIR}/version" ]; then
@@ -91,14 +91,14 @@ if [ -z "${arg}" -a -z "${TFENV_TERRAFORM_VERSION:-""}" ]; then
       version_requested='latest';
     fi;
 
-  else 
+  else
     log 'debug' "Version File is the default \${TFENV_CONFIG_DIR}/version (${TFENV_CONFIG_DIR}/version) but it doesn't exist";
     log 'debug' 'No version requested on the command line or in the version file search path. Installing "latest"';
     version_requested='latest';
   fi;
-elif [ -n "${TFENV_TERRAFORM_VERSION:-""}" ]; then
-  version_requested="${TFENV_TERRAFORM_VERSION}";
-  log 'debug' "TFENV_TERRAFORM_VERSION is set: ${TFENV_TERRAFORM_VERSION}";
+elif [ -n "${TFENV_Terragrunt_VERSION:-""}" ]; then
+  version_requested="${TFENV_Terragrunt_VERSION}";
+  log 'debug' "TFENV_Terragrunt_VERSION is set: ${TFENV_Terragrunt_VERSION}";
 else
   version_requested="${arg}";
 fi;
@@ -115,8 +115,8 @@ fi;
 
 if [[ "${version_requested}" =~ ^min-required$ ]]; then
   log 'debug' 'Detecting minimum required version...';
-  min_required="$(tfenv-min-required)" \
-    || log 'error' 'tfenv-min-required failed';
+  min_required="$(tgenv-min-required)" \
+    || log 'error' 'tgenv-min-required failed';
 
   if [ -z "${min_required}" ]; then
     log 'debug' 'It was not possible to detect a minimum-required version. Do you have a required_version line present?';

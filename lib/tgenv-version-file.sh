@@ -9,12 +9,12 @@ function find_local_version_file() {
 
   while ! [[ "${root}" =~ ^//[^/]*$ ]]; do
 
-    if [ -e "${root}/.terraform-version" ]; then
-      log 'debug' "Found at ${root}/.terraform-version";
-      echo "${root}/.terraform-version";
+    if [ -e "${root}/.terragrunt-version" ]; then
+      log 'debug' "Found at ${root}/.terragrunt-version";
+      echo "${root}/.terragrunt-version";
       return 0;
     else
-      log 'debug' "Not found at ${root}/.terraform-version";
+      log 'debug' "Not found at ${root}/.terragrunt-version";
     fi;
 
     [ -n "${root}" ] || break;
@@ -27,7 +27,7 @@ function find_local_version_file() {
 };
 export -f find_local_version_file;
 
-function tfenv-version-file() {
+function tgenv-version-file() {
   if ! find_local_version_file "${TFENV_DIR:-${PWD}}"; then
     if ! find_local_version_file "${HOME:-/}"; then
       log 'debug' "No version file found in search paths. Defaulting to TFENV_CONFIG_DIR: ${TFENV_CONFIG_DIR}/version";
@@ -35,4 +35,4 @@ function tfenv-version-file() {
     fi;
   fi;
 };
-export -f tfenv-version-file;
+export -f tgenv-version-file;

@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# Summary: Show the currently-selected terraform version
 
 set -uo pipefail;
 
@@ -56,14 +55,56 @@ for dir in libexec bin; do
   esac;
 done;
 
-# If on MacOS with Homebrew, use GNU grep
-# This allows keybase login detection to work on Mac,
-# and is required to be able to detect terraform version
-# from "required_version" setting in "*.tf" files
-check_dependencies;
-
 #####################
 # Begin Script Body #
 #####################
 
-tfenv-version-name "$@";
+[ "${#}" -ne 0 ] \
+  && log 'error' "usage: tgenv list";
+
+[ -d "${TFENV_CONFIG_DIR}/versions" ] \
+  || log 'error' 'No versions available. Please install one with: tgenv install';
+
+[[ -x "${TFENV_CONFIG_DIR}/versions" && -r "${TFENV_CONFIG_DIR}/versions" ]] \
+  || log 'error' "tgenv versions directory is inaccessible: ${TFENV_CONFIG_DIR}/versions";
+
+version_name="$(tgenv-version-name 2>/dev/null || true)" \
+  && log 'debug' "tgenv-version-name reported: ${version_name}";
+export version_name;
+
+if [ -z "${TFENV_Terragrunt_VERSION:-""}" ]; then
+  version_source="$(tgenv-version-file)" \
+    && log 'debug' "tgenv-version-file reported: ${version_source}" \
+    || log 'error' "tgenv-version-file failed";
+else
+  version_source='TFENV_Terragrunt_VERSION';
+fi;
+export version_source;
+
+# Register for whether a default terragrunt version has yet been set
+declare -i default_set=0;
+
+print_version () {
+  if [ "${1}" == "${version_name}" ]; then
+    echo "* ${1} (set by ${version_source})";
+    default_set=1;
+  else
+    echo "  ${1}";
+  fi;
+};
+
+log 'debug' 'Listing versions...';
+local_versions=($(\find "${TFENV_CONFIG_DIR}/versions/" -type d -exec basename {} \; \
+  | tail -n +2 \
+  | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3));
+
+log 'debug' "Local versions: ${local_versions[@]}";
+
+log 'debug' 'Printing versions...';
+for local_version in ${local_versions[@]}; do
+  print_version "${local_version}";
+done;
+
+[ "${default_set}" -eq 0 ] && log 'info' "No default set. Set with 'tgenv use <version>'";
+
+exit 0;

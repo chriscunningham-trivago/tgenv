@@ -1,13 +1,5 @@
 #!/usr/bin/env bash
-# Summary: Display the version of tfenv
-#
-# Displays the version number of this tfenv release, including the
-# current revision from git, if available.
-#
-# The format of the git revision is:
-#   <version>-<num_commits>-<git_sha>
-# where `num_commits` is the number of commits since `version` was
-# tagged.
+# Summary: Show the currently-selected terragrunt version
 
 set -uo pipefail;
 
@@ -64,23 +56,14 @@ for dir in libexec bin; do
   esac;
 done;
 
+# If on MacOS with Homebrew, use GNU grep
+# This allows keybase login detection to work on Mac,
+# and is required to be able to detect terragrunt version
+# from "required_version" setting in "*.tf" files
+check_dependencies;
+
 #####################
 # Begin Script Body #
 #####################
 
-log 'debug' 'Scraping tfenv version from CHANGELOG.md';
-version="$(awk '/^##/{ print $2; exit}' "${TFENV_ROOT}/CHANGELOG.md")" \
-  && log 'debug' "Found version '${version}' in CHANGELOG.md" \
-  || log 'error' 'Failed to scrape version from CHANGELOG.md';
-
-git_revision="";
-if cd "$(dirname ${0})" 2>/dev/null && git remote -v 2>/dev/null | grep -q tfenv; then
-  log 'debug' 'Git configuration found. Overriding CHANGELOG version from git revision...';
-  git_revision="$(git describe --tags HEAD 2>/dev/null || true)";
-  log 'debug' "Stripping git revision string from ${git_revision}";
-  git_revision="${git_revision#v}";
-fi;
-
-echo "tfenv ${git_revision:-$version}";
-
-exit 0;
+tgenv-version-name "$@";

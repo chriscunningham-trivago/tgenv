@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Usage: tfenv min-required
+# Usage: tgenv min-required
 # Summary: Detect the minimal required version from *tf files
 
 set -uo pipefail;
@@ -62,16 +62,16 @@ done;
 #####################
 
 bailout() {
-  log 'error' 'Error: Could not determine required_version based on your terraform sources.
+  log 'error' 'Error: Could not determine required_version based on your terragrunt sources.
 Make sure at least one of your *tf  or *.tf.json files includes a required version section like
-terraform {
+terragrunt {
   required_version = ">= 0.0.0"
 }
 
-see https://www.terraform.io/docs/configuration/terraform.html for details';
+see https://www.terragrunt.io/docs/configuration/terragrunt.html for details';
 };
 
-declare min_required="$(tfenv-min-required "${TFENV_DIR:-$(pwd)}")";
+declare min_required="$(tgenv-min-required "${TFENV_DIR:-$(pwd)}")";
 [[ -n "${min_required}" ]] \
   && echo "${min_required}" \
   || bailout;

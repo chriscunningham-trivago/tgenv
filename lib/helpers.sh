@@ -89,9 +89,9 @@ function check_active_version() {
       maybe_chdir="-chdir=${2}";
   fi;
 
-  local active_version="$(${TFENV_ROOT}/bin/terraform ${maybe_chdir} version | grep '^Terraform')";
+  local active_version="$(${TFENV_ROOT}/bin/terragrunt ${maybe_chdir} version | grep '^Terragrunt')";
 
-  if ! grep -E "^Terraform v${v}((-dev)|( \([a-f0-9]+\)))?\$" <(echo "${active_version}"); then
+  if ! grep -E "^Terragrunt v${v}((-dev)|( \([a-f0-9]+\)))?\$" <(echo "${active_version}"); then
     log 'debug' "Expected version ${v} but found ${active_version}";
     return 1;
   fi;
@@ -103,8 +103,8 @@ export -f check_active_version;
 
 function check_installed_version() {
   local v="${1}";
-  local bin="${TFENV_CONFIG_DIR}/versions/${v}/terraform";
-  [ -n "$(${bin} version | grep -E "^Terraform v${v}((-dev)|( \([a-f0-9]+\)))?$")" ];
+  local bin="${TFENV_CONFIG_DIR}/versions/${v}/terragrunt";
+  [ -n "$(${bin} version | grep -E "^Terragrunt v${v}((-dev)|( \([a-f0-9]+\)))?$")" ];
 };
 export -f check_installed_version;
 
@@ -122,8 +122,8 @@ function cleanup() {
   rm -rf ./version;
   log 'debug' "Deleting ${pwd}/versions";
   rm -rf ./versions;
-  log 'debug' "Deleting ${pwd}/.terraform-version";
-  rm -rf ./.terraform-version;
+  log 'debug' "Deleting ${pwd}/.terragrunt-version";
+  rm -rf ./.terragrunt-version;
   log 'debug' "Deleting ${pwd}/min_required.tf";
   rm -rf ./min_required.tf;
   log 'debug' "Deleting ${pwd}/chdir-dir";
@@ -149,9 +149,9 @@ function check_dependencies() {
 };
 export -f check_dependencies;
 
-source "$TFENV_ROOT/lib/tfenv-exec.sh";
-source "$TFENV_ROOT/lib/tfenv-min-required.sh";
-source "$TFENV_ROOT/lib/tfenv-version-file.sh";
-source "$TFENV_ROOT/lib/tfenv-version-name.sh";
+source "$TFENV_ROOT/lib/tgenv-exec.sh";
+source "$TFENV_ROOT/lib/tgenv-min-required.sh";
+source "$TFENV_ROOT/lib/tgenv-version-file.sh";
+source "$TFENV_ROOT/lib/tgenv-version-name.sh";
 
 export TFENV_HELPERS=1;

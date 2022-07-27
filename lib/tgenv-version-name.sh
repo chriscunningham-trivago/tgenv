@@ -2,13 +2,13 @@
 
 set -uo pipefail;
 
-function tfenv-version-name() {
-  if [[ -z "${TFENV_TERRAFORM_VERSION:-""}" ]]; then
-    log 'debug' 'We are not hardcoded by a TFENV_TERRAFORM_VERSION environment variable';
+function tgenv-version-name() {
+  if [[ -z "${TFENV_Terragrunt_VERSION:-""}" ]]; then
+    log 'debug' 'We are not hardcoded by a TFENV_Terragrunt_VERSION environment variable';
 
-    TFENV_VERSION_FILE="$(tfenv-version-file)" \
-      && log 'debug' "TFENV_VERSION_FILE retrieved from tfenv-version-file: ${TFENV_VERSION_FILE}" \
-      || log 'error' 'Failed to retrieve TFENV_VERSION_FILE from tfenv-version-file';
+    TFENV_VERSION_FILE="$(tgenv-version-file)" \
+      && log 'debug' "TFENV_VERSION_FILE retrieved from tgenv-version-file: ${TFENV_VERSION_FILE}" \
+      || log 'error' 'Failed to retrieve TFENV_VERSION_FILE from tgenv-version-file';
 
     TFENV_VERSION="$(cat "${TFENV_VERSION_FILE}" || true)" \
       && log 'debug' "TFENV_VERSION specified in TFENV_VERSION_FILE: ${TFENV_VERSION}";
@@ -16,10 +16,10 @@ function tfenv-version-name() {
     TFENV_VERSION_SOURCE="${TFENV_VERSION_FILE}";
 
   else
-    TFENV_VERSION="${TFENV_TERRAFORM_VERSION}" \
-      && log 'debug' "TFENV_VERSION specified in TFENV_TERRAFORM_VERSION environment variable: ${TFENV_VERSION}";
+    TFENV_VERSION="${TFENV_Terragrunt_VERSION}" \
+      && log 'debug' "TFENV_VERSION specified in TFENV_Terragrunt_VERSION environment variable: ${TFENV_VERSION}";
 
-    TFENV_VERSION_SOURCE='TFENV_TERRAFORM_VERSION';
+    TFENV_VERSION_SOURCE='TFENV_Terragrunt_VERSION';
   fi;
 
   local auto_install="${TFENV_AUTO_INSTALL:-true}";
@@ -27,13 +27,13 @@ function tfenv-version-name() {
   if [[ "${TFENV_VERSION}" == "min-required" ]]; then
     log 'debug' 'TFENV_VERSION uses min-required keyword, looking for a required_version in the code';
 
-    local potential_min_required="$(tfenv-min-required)";
+    local potential_min_required="$(tgenv-min-required)";
     if [[ -n "${potential_min_required}" ]]; then
       log 'debug' "'min-required' converted to '${potential_min_required}'";
       TFENV_VERSION="${potential_min_required}" \
-      TFENV_VERSION_SOURCE='terraform{required_version}';
+      TFENV_VERSION_SOURCE='terragrunt{required_version}';
     else
-      log 'error' 'Specifically asked for min-required via terraform{required_version}, but none found';
+      log 'error' 'Specifically asked for min-required via terragrunt{required_version}, but none found';
     fi;
   fi;
 
@@ -58,12 +58,12 @@ function tfenv-version-name() {
 
       log 'debug' "Resolved ${TFENV_VERSION} to locally installed version: ${local_version}";
     elif [[ "${auto_install}" != "true" ]]; then
-      log 'error' 'No versions of terraform installed and TFENV_AUTO_INSTALL is not true. Please install a version of terraform before it can be selected as latest';
+      log 'error' 'No versions of terragrunt installed and TFENV_AUTO_INSTALL is not true. Please install a version of terragrunt before it can be selected as latest';
     fi;
 
     if [[ "${auto_install}" == "true" ]]; then
       log 'debug' "Using latest keyword and auto_install means the current version is whatever is latest in the remote. Trying to find the remote version using the regex: ${regex}";
-      remote_version="$(tfenv-list-remote | grep -e "${regex}" | head -n 1)";
+      remote_version="$(tgenv-list-remote | grep -e "${regex}" | head -n 1)";
       if [[ -n "${remote_version}" ]]; then
           if [[ "${local_version}" != "${remote_version}" ]]; then
             log 'debug' "The installed version '${local_version}' does not much the remote version '${remote_version}'";
@@ -78,7 +78,7 @@ function tfenv-version-name() {
       if [[ -n "${local_version}" ]]; then
         TFENV_VERSION="${local_version}";
       else
-        log 'error' "No installed versions of terraform matched '${TFENV_VERSION}'";
+        log 'error' "No installed versions of terragrunt matched '${TFENV_VERSION}'";
       fi;
     fi;
   else
@@ -92,11 +92,11 @@ function tfenv-version-name() {
   fi;
 
   if [[ -z "${TFENV_VERSION}" ]]; then
-    log 'error' "Version could not be resolved (set by ${TFENV_VERSION_SOURCE} or tfenv use <version>)";
+    log 'error' "Version could not be resolved (set by ${TFENV_VERSION_SOURCE} or tgenv use <version>)";
   fi;
 
   if [[ "${TFENV_VERSION}" == min-required ]]; then
-    TFENV_VERSION="$(tfenv-min-required)";
+    TFENV_VERSION="$(tgenv-min-required)";
   fi;
 
   if [[ ! -d "${TFENV_CONFIG_DIR}/versions/${TFENV_VERSION}" ]]; then
@@ -105,5 +105,4 @@ function tfenv-version-name() {
 
   echo "${TFENV_VERSION}";
 };
-export -f tfenv-version-name;
-
+export -f tgenv-version-name;

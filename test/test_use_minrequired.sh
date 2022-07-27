@@ -57,13 +57,13 @@ log 'info' '### Install min-required normal version (#.#.#)';
 
 minv='0.8.0';
 
-echo "terraform {
+echo "terragrunt {
   required_version = \">=${minv}\"
 }" > min_required.tf;
 
 (
-  tfenv install min-required;
-  tfenv use min-required;
+  tgenv install min-required;
+  tgenv use min-required;
   check_active_version "${minv}";
 ) || error_and_proceed 'Min required version does not match';
 
@@ -74,13 +74,13 @@ log 'info' '### Install min-required tagged version (#.#.#-tag#)'
 
 minv='0.13.0-rc1'
 
-echo "terraform {
+echo "terragrunt {
     required_version = \">=${minv}\"
 }" > min_required.tf;
 
 (
-  tfenv install min-required;
-  tfenv use min-required;
+  tgenv install min-required;
+  tgenv use min-required;
   check_active_version "${minv}";
 ) || error_and_proceed 'Min required tagged-version does not match';
 
@@ -91,13 +91,13 @@ log 'info' '### Install min-required incomplete version (#.#.<missing>)'
 
 minv='0.12';
 
-echo "terraform {
+echo "terragrunt {
   required_version = \">=${minv}\"
 }" >> min_required.tf;
 
 (
-  tfenv install min-required;
-  tfenv use min-required;
+  tgenv install min-required;
+  tgenv use min-required;
   check_active_version "${minv}.0";
 ) || error_and_proceed 'Min required incomplete-version does not match';
 
@@ -108,13 +108,13 @@ log 'info' '### Install min-required with TFENV_AUTO_INSTALL';
 
 minv='1.0.0';
 
-echo "terraform {
+echo "terragrunt {
   required_version = \">=${minv}\"
 }" >> min_required.tf;
-echo 'min-required' > .terraform-version;
+echo 'min-required' > .terragrunt-version;
 
 (
-  TFENV_AUTO_INSTALL=true terraform version;
+  TFENV_AUTO_INSTALL=true terragrunt version;
   check_active_version "${minv}";
 ) || error_and_proceed 'Min required auto-installed version does not match';
 
@@ -126,13 +126,13 @@ log 'info' '### Install min-required with TFENV_AUTO_INSTALL & -chdir';
 minv='1.1.0';
 
 mkdir -p chdir-dir
-echo "terraform {
+echo "terragrunt {
   required_version = \">=${minv}\"
 }" >> chdir-dir/min_required.tf;
-echo 'min-required' > chdir-dir/.terraform-version
+echo 'min-required' > chdir-dir/.terragrunt-version
 
 (
-  TFENV_AUTO_INSTALL=true terraform -chdir=chdir-dir version;
+  TFENV_AUTO_INSTALL=true terragrunt -chdir=chdir-dir version;
   check_active_version "${minv}" chdir-dir;
 ) || error_and_proceed 'Min required version from -chdir does not match';
 

@@ -52,7 +52,7 @@ declare -a errors=();
 
 log 'info' '### Testing symlink functionality';
 
-TFENV_BIN_DIR='/tmp/tfenv-test';
+TFENV_BIN_DIR='/tmp/tgenv-test';
 log 'info' "## Creating/clearing ${TFENV_BIN_DIR}"
 rm -rf "${TFENV_BIN_DIR}" && mkdir "${TFENV_BIN_DIR}";
 log 'info' "## Symlinking ${PWD}/bin/* into ${TFENV_BIN_DIR}";
@@ -61,10 +61,10 @@ ln -s "${PWD}"/bin/* "${TFENV_BIN_DIR}";
 cleanup || log 'error' 'Cleanup failed?!';
 
 log 'info' '## Installing 0.8.2';
-${TFENV_BIN_DIR}/tfenv install 0.8.2 || error_and_proceed 'Install failed';
+${TFENV_BIN_DIR}/tgenv install 0.8.2 || error_and_proceed 'Install failed';
 
 log 'info' '## Using 0.8.2';
-${TFENV_BIN_DIR}/tfenv use 0.8.2 || error_and_proceed 'Use failed';
+${TFENV_BIN_DIR}/tgenv use 0.8.2 || error_and_proceed 'Use failed';
 
 log 'info' '## Check-Version for 0.8.2';
 check_active_version 0.8.2 || error_and_proceed 'Version check failed';
